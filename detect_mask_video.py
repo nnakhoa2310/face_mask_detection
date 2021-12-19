@@ -32,6 +32,7 @@ from keras.preprocessing.image import img_to_array
 from keras.preprocessing import image
 import tkinter.filedialog as tkFileDialog
 from pygame import mixer
+import pyttsx3
 
 from email.message import EmailMessage
 
@@ -98,9 +99,15 @@ def save_frame(f):
     print("[INFO] saving image...")
 
 def play_alarm_sound_function():
-    mixer.init()
-    sound = mixer.Sound('alarm.wav')
-    sound.play()
+    # mixer.init()
+    # sound = mixer.Sound('alarm.wav')
+    # sound.play()
+    engine = pyttsx3.init()
+    voices = engine.getProperty('voices')
+    engine.setProperty('voice', voices[1].id)
+    engine.setProperty('rate', 150)
+    engine.say("There's a people don't wear masks")
+    engine.runAndWait()
 def send_mail_function():
     try:
          msg = EmailMessage()
@@ -234,23 +241,21 @@ class Toplevel1:
                 cv2.putText(frame, label, (startX, startY - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
                 cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
-
                 label = "Mask" if mask > withoutmask else "No Mask"
                 color = (0, 255, 0) if label == "Mask" else (0, 0, 255)
-
                 # include the probability in the label
                 if (label == 'No Mask'):
                     threading.Thread(target=save_frame(f=frame)).start()
                     threading.Thread(target=send_mail_function).start()
                     threading.Thread(target=play_alarm_sound_function).start()
 
-                elif (label == 'Mask'):
-                    image = cv2.rectangle(frame, start_point,
-                                          end_point, (0, 255, 0), thickness)
-                    cv2.putText(image, label, (30, 60),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1.6, (0, 0, 0), 3)
-                    pass
-                    break
+                # elif (label == 'Mask'):
+                #     image = cv2.rectangle(frame, start_point,
+                #                           end_point, (0, 255, 0), thickness)
+                #     cv2.putText(image, label, (30, 60),
+                #                 cv2.FONT_HERSHEY_SIMPLEX, 1.6, (0, 0, 0), 3)
+                #     pass
+                #     break
                 else:
                     print("Invalid")
 
